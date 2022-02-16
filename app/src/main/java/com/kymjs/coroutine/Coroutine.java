@@ -1,22 +1,32 @@
 package com.kymjs.coroutine;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Coroutine {
-    private static final AtomicInteger count = new AtomicInteger();
-    public final int coroutineId;
+    private static final AtomicLong count = new AtomicLong();
+    public final long coroutineId;
+    public final long threadId;
 
     public Coroutine() {
-        coroutineId = count.incrementAndGet();
+        this(Thread.currentThread().getId());
     }
 
-    public <T> T run() {
+    public Coroutine(long id) {
+        coroutineId = count.incrementAndGet();
+        threadId = id;
+        init(threadId);
+    }
+
+    public <T> void onAwait(T result) {
+    }
+
+    public Object run() {
         return null;
     }
 
-    private native void async();
+    private native void init(long threadId);
 
-    public native <T> T await();
+    public native void async();
 
     public native void delay(long millis);
 }

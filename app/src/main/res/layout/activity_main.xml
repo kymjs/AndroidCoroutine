@@ -20,6 +20,12 @@
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="线程中断" />
+        android:text="主线程执行协程" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="子线程执行协程" />
 
 </LinearLayout>

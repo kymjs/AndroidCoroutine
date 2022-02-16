@@ -6,14 +6,16 @@
 #define COROUTINE_OSTHREAD_H
 
 
-#include "CoroutineThread.h"
+#include "CoroutineDespatcher.h"
 
 class OSThread {
-private:
-    CoroutineThread *coroutineThread;
-
 public:
-    OSThread(CoroutineThread *pCoroutineThread);
+    long threadId;
+    CoroutineDespatcher *despatcher;
+
+    OSThread(JNIEnv *env, long threadId);
+
+    ~OSThread();
 
     void start();
 
