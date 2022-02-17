@@ -28,6 +28,12 @@ class MainActivity : AppCompatActivity() {
         binding!!.button1.setOnClickListener { TestThread().start() }
         binding!!.button2.setOnClickListener { TestCoroutine().async() }
         binding!!.button3.setOnClickListener { TestCoroutine(2).async() }
+        binding!!.button4.setOnClickListener {
+            val a1 = TestCoroutine(2)
+            val a2 = TestCoroutine(2)
+            a1.async()
+            a2.join()
+        }
     }
 
     internal class TestThread : LiteThread() {
@@ -60,6 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun run(): Any {
             super.run()
+            println("========run::" + hashCode())
             try {
                 return URL("https://baidu.com").readText()
             } catch (e: Exception) {
@@ -70,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun <T> onAwait(result: T) {
             super.onAwait(result)
+            println("========onAwait::" + hashCode())
             println("========output::$result")
         }
     }

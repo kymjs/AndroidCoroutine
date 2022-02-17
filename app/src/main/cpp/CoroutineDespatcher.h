@@ -13,7 +13,9 @@
 
 class CoroutineDespatcher {
 private:
-    ConcurrenceQueue<OSCoroutine *> queue;
+    ConcurrenceQueue<OSCoroutine *> fightQueue;
+    ConcurrenceQueue<OSCoroutine *> suspendQueue;
+    OSCoroutine *fightCoroutine;
     bool mainThread;
     JNIEnv *env;
 
@@ -21,13 +23,14 @@ private:
 
 public:
     JavaVM *jvm;
-    bool interruptState = false;
 
     ~CoroutineDespatcher();
 
     CoroutineDespatcher(JNIEnv *env, bool mainThread);
 
     void despatch();
+
+    void join(jobject jobj);
 
     void attachCoroutine(jobject jobj);
 };

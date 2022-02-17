@@ -29,4 +29,6 @@ public class Coroutine {
     public native void async();
 
     public native void delay(long millis);
+
+    public native void join();
 }

@@ -16,16 +16,34 @@ OSCoroutine::~OSCoroutine() {
 }
 
 void OSCoroutine::async(JNIEnv *env) {
-    if (jvm->AttachCurrentThread(&env, NULL) != 0) {
-        LOGD("faile to attach");
-    }
-
-    jclass jCoroutineClass = env->GetObjectClass(jCoroutine);
-    jmethodID runId = env->GetMethodID(jCoroutineClass, "run", "()Ljava/lang/Object;");
-    if (runId != nullptr) {
-        await(env, env->CallObjectMethod(jCoroutine, runId));
+    if (suspendState == NEED_RESUME) {
+        resume(env);
     } else {
-        LOGD("No run method found in Coroutine");
+        suspendState = NONE;
+        if (jvm->AttachCurrentThread(&env, NULL) != 0) {
+            LOGD("faile to attach");
+        }
+
+        jclass jCoroutineClass = env->GetObjectClass(jCoroutine);
+        jmethodID runId = env->GetMethodID(jCoroutineClass, "run", "()Ljava/lang/Object;");
+        if (runId != nullptr) {
+            suspendAwait(env, env->CallObjectMethod(jCoroutine, runId));
+        } else {
+            LOGD("No run method found in Coroutine");
+        }
+    }
+}
+
+void OSCoroutine::suspendAwait(JNIEnv *env, jobject result) {
+    if (suspendState == SUSPEND) {
+        if (setjmp(suspendPoint)) {
+            await(env, result);
+        } else {
+            suspendState = NEED_RESUME;
+            LOGD("挂起协程：%lld", coroutineId);
+        }
+    } else if (suspendState == NONE) {
+        await(env, result);
     }
 }
 
@@ -35,9 +53,17 @@ void OSCoroutine::await(JNIEnv *env, jobject result) {
     if (onAwaitMethod != nullptr) {
         env->CallVoidMethod(jCoroutine, onAwaitMethod, result);
     }
+    suspendState = FINISHED;
+    LOGD("协程：%lld，执行完成", coroutineId);
     env->DeleteGlobalRef(jCoroutine);
 }
 
 void OSCoroutine::delay(jlong millis) {
 
+}
+
+void OSCoroutine::resume(JNIEnv *env) {
+    LOGD("恢复协程%lld", coroutineId);
+    suspendState = RESUMED;
+    longjmp(suspendPoint, 1);
 }

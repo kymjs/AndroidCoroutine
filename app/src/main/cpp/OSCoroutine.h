@@ -8,13 +8,22 @@
 
 #include <jni.h>
 #include "log.h"
+#include <setjmp.h>
+
+const int NONE = 0;
+const int SUSPEND = 1;
+const int NEED_RESUME = 2;
+const int RESUMED = 3;
+const int FINISHED = 4;
 
 class OSCoroutine {
+private:
+    jmp_buf suspendPoint;
 public:
     JavaVM *jvm;
     jobject jCoroutine;
     jlong coroutineId;
-    bool suspendState = false;
+    int suspendState = NONE;
 
     ~OSCoroutine();
 
@@ -24,7 +33,11 @@ public:
 
     void await(JNIEnv *env, jobject result);
 
+    void suspendAwait(JNIEnv *env, jobject result);
+
     void delay(jlong millis);
+
+    void resume(JNIEnv *env);
 };
 
 
