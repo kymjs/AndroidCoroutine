@@ -7,11 +7,9 @@
 
 #include <jni.h>
 #include "ConcurrenceQueue.h"
-#include "Suspender.h"
+#include "pthread.h"
 #include "OSCoroutine.h"
 #include "log.h"
-
-using namespace std;
 
 class CoroutineDespatcher {
 private:
@@ -23,7 +21,6 @@ private:
 
 public:
     JavaVM *jvm;
-    Suspender parker;
     bool interruptState = false;
 
     ~CoroutineDespatcher();

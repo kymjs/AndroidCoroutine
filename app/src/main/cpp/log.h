@@ -1,15 +1,10 @@
-//
-// Created by nieyinyin on 2021/11/16.
-//
-
 #ifndef CORE_LOG_H
 #define CORE_LOG_H
 
 #define APP_NAME "com.kymjs.coroutine"
 #define DEBUG 1
-#define ANDROID_H
 
-#ifdef ANDROID_H
+#ifdef __ANDROID__
 
 #include <jni.h>
 #include <android/log.h>
@@ -28,7 +23,7 @@
 #define LOGE(...) {}
 #endif
 
-#else // ANDROID_H
+#else // __ANDROID__
 
 ///================= package define =====================
 #define ARG_COUNT_PRIVATE(\
